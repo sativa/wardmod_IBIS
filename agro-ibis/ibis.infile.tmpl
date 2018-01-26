@@ -1,0 +1,48 @@
+0           ! irestart   0: not a restart run  1: restart run
+1948        ! irstyear   actual calendar year of restart run
+1948        !1751        ! iyear0     initial year of simulation (don't change for restart)
+1           !8           ! nrun       number of years in this simulation (change for restart)
+zedx        ! datasource: file in input_descriptions directory describing the climate data source (remember to also change comgrid.f if necessary)
+.false.     ! weather_generator: if true, use weather generator prior to iyrdaily; if false, use random year of data
+1948        ! iyranom    year to start reading anomalies (don't chng for restart) (ignored if weather_generator=FALSE: then we read anomalies whenever we read daily data)
+1948        ! iyrdaily   year to start reading daily data (ditto)
+9999        ! imetyear   year to start using hourly met data from arlington field station (ditto)
+9999        ! imetend    year to end reading in hourly met data from arlington field station (ditto)
+-1          ! seed       initial random number seed: should be < 0, or 0 to seed the random number generator using the current time
+0           ! soilcspin  0: no soil spinup, 1: acceleration procedure used 
+0           ! flg_wrestart  1(default): write restart files  0: no restart files
+1           ! iyearout   0: no yearly output, 1: yearly output
+1           ! imonthout  0: no monthly output, 1: monthly output
+1           ! idailyout  0: no daily output, 1: daily output
+0           ! ihourlyout 0: no hourly output, 1: hourly output
+1           ! isimveg    0: static veg, 1: dynamic veg, 2: dynamic veg-cold start
+0           ! isimfire   0: wildfire off, 1: wildfire on
+0           ! isimco2    0: fixed co2,  1: ramped co2
+0           ! irrigate_flag   0: no irrigation 1: irrigation strategy used everywhere 2: read map specifying where irrigation is used
+0           ! nstress    0: no nitrogen stress, 1: apply nitrogen stress
+0           ! isoybean   0: soybeans not grown 1: soybeans grown everywhere 
+0           ! imaize     0: maize not grown 1: maize grown everywhere 
+0           ! iwheat     0: no wheat grown 1: spring wheat grown everywhere 2: winter wheat 
+0           ! irotation  0: none 1: winter wheat/fallow 2: 2 corn/soy 3: corn/corn/soy 4: soy/winter wheat/corn  
+0           ! iholdsoiln 0: doesn't save soil inorganic N from restart 1: save inorganic soil N  
+0           ! isoil_layer   0(default): no; 1: yes    Read-in soils with layered data from a NetCDF file.
+0           ! iyr_pft       0(default): no; 1: yes    Read-in pft on a year-by-year basis from NetCDF files
+0           ! iyr_fert      0(default): no; 1: yes    Read-in fertilizer application on a year-by-year basis from NetCDF files
+1           ! iagro_thmb    0(default): no coupled argo-ibis thmb simulation; 1: yes
+'/Users/WardLab/Documents/agro-ibis/yuwei/thmb/test'    ! agro_thmb_path  directory for communication files for coupled agro-ibis thmb
+200         !commu_MaxWait(default 200):  Number of times to wait for communiation files
+1           !commu_sleep(integer, default 1): put the code to sleep during wait in [seconds]
+1.0         ! ffact      numeric multiplying factor applied to N fertilizer after end of fertilizer data (for all crops)
+.false.     ! management_prescribed: If true, use prescribed planting dates & cultivars, as read from maps; if false, use prognostic planting dates & cultivars
+transient   ! planting_input: Suffix on the planting date input file name (e.g., 'transient', 'detrended', 'linearized' or 'fixed'), for management_prescribed=true
+transient   ! cultivar_input: Suffix on the cultivar input file name (e.g., 'transient' or 'fixed'), for management_prescribed=true
+1           ! overveg    0: PFTs compete based on climate constraints  1: PFTs compete based on current land cover & climate 
+9           ! isoilay    soil layer for which nitrate leaching/drainage is output  
+0.000370    ! co2init    initial co2 concentration in mol/mol (real)
+0.209000    ! o2init     initial o2 concentration in mol/mol (real)
+3600.       ! dtime      time step in seconds
+0           ! idiag      0: no diagnostic output, 1-10 # of files to output
+41.79167    !47.04167    !41.79167    ! snorth		northern latitude for subsetting in/output
+41.375      !39.37500     !41.375    ! ssouth     southern latitude for subsetting in/output
+-92.79166   !-94.62498     !-92.79166    ! swest      western longitude for subsetting in/output
+-91.625     !-86.29166    !-91.625    ! seast      eastern longitude for subsetting in/output

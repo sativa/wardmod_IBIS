@@ -1,0 +1,21 @@
+&climate
+  climate_mngt_mode = 'none'                        !options: 'none'(default),'dat','nc'
+  climate_mngt_file = 'climateMngt_template.dat'    !file name; used when climate_mngt_mode = 'dat' or 'nc'
+
+
+/end climate
+
+&fertilizer
+  fertilizer_mngt_mode = 'none'                     !options: 'none'(default),'years_ave', 'dat'
+  fertilizer_mngt_year_start = 1945                 !current range 1945~2004; used only when mode = 'years_ave'
+  fertilizer_mngt_year_end   = 1945
+
+  fertilizer_mngt_file = 'fertilizerMngt_dailyPct_template.dat'    !file name; used when fertilizer_mngt_mode = 'dat'
+
+/end fertilizer
+
+&covercrop
+  covercrop_mngt_mode = 'none'                      !Just keep this as 'dat'
+  covercrop_mngt_file = 'climateMngt_template.dat'
+
+/end covercrop

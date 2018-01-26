@@ -1,0 +1,92 @@
+This file contains a list of things that should be done.
+
+WJS (4-16-10): Fix what I believe is a potential bug in the code to loop
+through files. There could be problems when we try to read a leap year
+in a non leap-year, or vice versa. See my comment about this in io.f :
+rdday.
+
+WJS (5-16-10): Check the uncertainties mentioned in the log message
+for r119. These are:
+
+  - Should respiration be changed in the period between maturity and
+    harvest? I haven't modified anything respiration-related, and I
+    don't *think* that anything is done with croplive with respect to
+    respiration (e.g., root respiration). Should we, for example, turn
+    off root respiration after maturity?
+
+  - When winter wheat is killed due to cold temperatures (croplive(i,15)
+    is set to 0), should anything else be done here, like setting
+    croppresent to 0, or setting harvdate?
+
+  - Right now, the nstress-related code in subroutine nitrostress
+    (crops.f) is not executed between maturity and harvest. That is, it
+    depends on croplive. Should this be changed to depend on
+    croppresent???
+
+  - In solute.f, I have fin=fertnitro happen when croppresent = 1;
+    should this be changed to happen when croplive = 1? (Which is used
+    in solute.f should probably be consistent with which is used in
+    subroutine planting, in the conditional deciding whether to
+    fertilize. But it actually probably doesn't matter whether I use
+    croppresent or croplive in these two places.)
+
+
+WJS (6-30-10): Change the calculation of 'absorb' in stats.f to use
+the proper parameters (i.e., green vs. brown). I am not entirely sure
+this is necessary, but at a glance, it looks like it should be done.
+
+WJS (7-12-10): Retune some things based on the new GDD formulation -
+both because we are now using gdd_crop_modified rather than
+gdd_crop_tmean, and because we are now using a base temperature of 10C
+rather than 8C for corn. Some things that may need to be retuned or
+otherwise modified are the following (but there may be other things as
+well):
+
+  - How the length of the crop seasons are determined in crops.f (in the
+    planting_prognostic subroutine): the 0.8, 0.9 and 1.2 factors that
+    are multiplied by gddcorn may no longer be appropriate. This is
+    especially true for the soybean and wheat factors (0.8 and 1.2,
+    respectively), since we have changed the base for corn GDD
+    accumulation, but the base for soybean and wheat GDD accumulation is
+    still the same as before.
+
+  - hybgdd in params.crp: max GDD means something slightly different
+    with this new GDD formulation
+
+  - lfemerg in params.crp: with the new GDD formulation, this fraction
+    might have to be changed slightly to give about the same number of
+    days from planting to emergence that was obtained in the old code
+
+  - grnfill parameter in params.crp: this might have to be adjusted
+    slightly to maintain a good split between the number of days in the
+    vegetative and reproductive periods. This might be especially true
+    for corn, for which the CRM-based corrections rely on the value of
+    gddmaturity, which will be different with the new GDD function.
+
+
+
+WJS (7-12-10): Test the new gdd formulation (gdd_crop_modified) when the
+model is run using met station data (i.e., in dailymet). In particular,
+I'm not positive that tmin and tmax are set appropriately before the
+call to dailymet.
+
+WJS (7-12-10): Change the daystoharv parameter for wheat to be non-zero
+(in params.crp). It's possible that this should be split into two
+parameters, one for spring wheat and one for winter wheat, as is done
+for many other wheat parameters.
+
+WJS (8-4-10): For management_prescribed=TRUE, the input files and code
+should be changed so that the variables (planting.date, total.gdd,
+etc.) are specified separately for each crop type. Currently, the same
+variables apply regardless of the crop type being used. This was fine
+for my simulations, which only used maize. But it means that, in order
+to do a simulation with a different crop type, you need to change the
+input files, either by moving files around, or by changing the values
+of the planting_input and cultivar_input variables in
+ibis.infile. Perhaps more importantly, it also means that you
+currently cannot use crop rotations in conjunction with
+management_prescribed=TRUE.
+
+  - If this is fixed, you can delete the comments in crops.f beginning
+    with "Note that there is a single..." (As of 8-4-10, I believe
+    there are 3 such comments - search for 'there is a single')

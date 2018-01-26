@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Copies the setup from an existing Agro-IBIS installation:
+# - For each <filename>.tmpl, copies the local file (without the '.tmpl')
+#   from the existing installation to this directory
+# - Makes a symbolic link, 'input', pointing to the existing input
+#   directory (or its target, if it is a link itself)
+# Also, sets up output and restart directories, as in initial_setup
+#
+# Usage: copy_setup path
+#  - where 'path' is the path to the existing Agro-IBIS installation
+#
+# See also: initial_setup, which performs similar actions without
+# copying an existing installation
+
+
+# Check command-line arguments
+if (( $# != 1 )); then
+    echo "Usage: $0 path"
+    echo "where 'path' is the path to the existing Agro-IBIS installation"
+    exit 1
+fi
+
+
+# Copy files
+old_build=$1
+for fl in *.tmpl; do
+    base=`basename $fl .tmpl`  # strip trailing '.tmpl'
+    cp -i -v $old_build/$base $base
+done
+
+
+# Link to input directory
+if [ -L $old_build/input ]; then
+    # The input directory in the existing installation is itself a link.
+    # We'll link to its target.
+    source=`readlink $old_build/input`
+else
+    # The input directory in the existing installation is NOT a link.
+    # We'll link directly to it.
+    source=$old_build/input
+fi
+
+ln -h -i -v -s $source input
+
+
+# Create output and restart directories:
+echo
+echo "Setting up output directory:"
+mkdir -v -p output/daily output/monthly output/yearly
+
+echo
+echo "Setting up restart directory:"
+mkdir -v -p restart

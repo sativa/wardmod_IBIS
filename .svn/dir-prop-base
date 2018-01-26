@@ -1,0 +1,14 @@
+K 10
+svn:ignore
+V 6
+*.mod
+
+K 13
+svn:mergeinfo
+V 164
+/branches/jpatton_hourly:211-213
+/branches/motew:18-163
+/branches/motew_fire:164-179
+/branches/sacks_effects_of_pdate_and_cultivar:92-195
+/branches/sacks_zedx:19-61
+END

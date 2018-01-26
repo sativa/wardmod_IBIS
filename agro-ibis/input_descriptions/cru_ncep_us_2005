@@ -1,0 +1,49 @@
+! This file describes the climate data used when using a combination of
+!  CRU (monthly values) and NCEP (daily anomalies) over the U.S. The
+!  climate files used here go through 2005.
+
+&input_description
+
+read_daily_directly = .FALSE.
+one_file_per_year = .FALSE.
+read_tmin_tmax = .FALSE.
+read_radiation = .FALSE.
+correct_sphumid = .TRUE.
+conserve_tdew = .FALSE.
+
+istyrm = 1901
+nanom = 105
+istyrd = 1948
+nanomd = 58
+
+level_var = 'level'
+
+fn_cloud_mon_clim = 'cld.mon'
+fn_cloud_mon = 'cld.CRU.1901_2005.US'
+fn_cloud_daily = 'tcdcclm_us.danom.1948_2005'
+fn_temp_mon_clim = 'temp.mon'
+fn_temp_mon = 'temp.CRU.1901_2005.US'
+fn_temp_daily = 'tmp2m_us.danom.1948_2005'
+fn_dtr_mon_clim = 'trange.mon'
+fn_dtr_mon = 'dtr.CRU.1901_2005.US'
+fn_dtr_daily = 'trange_us.fanom.1948_2005'
+fn_prec_mon_clim = 'prec.mon'
+fn_prec_mon = 'prate.CRU.1901_2005.US'
+fn_prec_daily = 'prate_us.fanom.1948_2005'
+fn_rh_mon_clim = 'rh.mon'
+fn_rh_mon = 'rh.CRU.1901_2005.US'
+fn_rh_daily = 'spfh2m_us.fanom.1948_2005'
+fn_wspd_mon_clim = 'wspd.mon'
+fn_wspd_mon = ' '   ! no monthly timeseries of wind speed
+fn_wspd_daily = 'wspd_us.fanomc.1948_2005'
+fn_wetd_mon_clim = 'wetd.mon'
+fn_wetd_mon = ' '   ! no monthly timeseries of wet days
+fn_tminavgann = 'tminavgann'
+
+! Just specify variable names that differ from their default values:
+var_dtr_mon_clim = 'trange'
+var_dtr_daily = 'trange'
+var_prec_mon = 'prate'
+var_rh_daily = 'sphum'
+
+/

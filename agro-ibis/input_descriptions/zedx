@@ -1,0 +1,38 @@
+! This file describes the climate data used when using zedx daily data
+
+&input_description
+
+read_daily_directly = .TRUE.
+one_file_per_year = .TRUE.
+read_tmin_tmax = .TRUE.
+read_radiation = .TRUE.
+correct_sphumid = .FALSE.
+conserve_tdew = .TRUE.
+
+istyrd = 1948
+nanomd = 60
+
+level_var = 'lev'
+
+fn_rads_mon_clim = 'zedx/RADS_60year_climo'
+fn_rads_daily = 'zedx/daily/rads'
+fn_tmin_mon_clim = 'zedx/TMIN_60year_climo'
+fn_tmin_daily = 'zedx/daily/tmin'
+fn_tmax_mon_clim = 'zedx/TMAX_60year_climo'
+fn_tmax_daily = 'zedx/daily/tmax'
+fn_prec_mon_clim = 'zedx/PREC_60year_climo_mm_day'
+fn_prec_daily = 'zedx/daily/prec'
+fn_rh_mon_clim = 'zedx/RELH_60year_climo'
+fn_rh_daily = 'zedx/daily/relh'
+fn_wspd_mon_clim = 'zedx/WSPD_60year_climo'
+fn_wspd_daily = 'zedx/daily/wspd'
+fn_wetd_mon_clim = ' '  ! no wetd variable specified for this data set
+fn_wetd_mon = ' '       ! no wetd variable specified for this data set
+fn_tminavgann = 'zedx/TMIN_annual_60year_climo'
+
+! Just specify variable names that differ from their default values:
+var_rh_mon_clim = 'relh'
+var_rh_daily = 'relh'
+var_tminavgann = 'tmin'
+
+/

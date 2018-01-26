@@ -1,0 +1,40 @@
+# Configuration options for makefile
+# Note: if you change anything in here, you should run 'make clean' before running 'make'
+# N.B.: No error checking is done, so be sure not to make any typos!
+
+# Declare your version ID here; this is just used for make tardist
+
+VERSION = AgroIBIS.miss.8.2.2006
+
+# Choose your compiler here; this will determine which compiler flags get set
+# Valid options are 'ifort', 'xlf' and 'gfortran'
+
+MY_FC = ifort
+
+# Choose your optimization level here
+# Valid options are 'opt', 'O0' and 'debug'
+# What each of these options does depends on the compiler
+
+OPT = O0
+
+# Add any non-standard 'include' directories here, e.g.:
+# INCLUDES = -I/usr/local/include
+# Recommendation: replace /usr/local/include with the location of 'netcdf.inc' on your system
+
+INCLUDES = -I/usr/local/include
+
+# Add any non-standard library directories here, e.g.:
+# LIBS = -L/usr/local/lib
+
+LIBS = 
+
+# Add any extra options here, to personalize your compilation experience
+# MY_F_OPTIONS: used when compiling FORTRAN code
+# MY_LD_OPTIONS: used when linking
+# Some recommendations:
+# - For 64-bit ifort: add '-diag-disable vec' (without the quotes) to both MY_F_OPTIONS and MY_LD_OPTIONS
+# - For 64-bit gfortran: add '-m64' (without the quotes) to both MY_F_OPTIONS and MY_LD_OPTIONS
+
+MY_F_OPTIONS =
+MY_LD_OPTIONS =
+

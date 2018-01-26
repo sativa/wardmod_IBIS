@@ -1,0 +1,208 @@
+# Get configuration options (MY_FC, etc.)
+include makefile.config
+
+# If any required variable wasn't present in makefile.config,
+#  halt with an error message
+ifndef VERSION
+$(error VERSION not defined in makefile.config)
+endif
+ifndef MY_FC
+$(error MY_FC not defined in makefile.config)
+endif
+ifndef OPT
+$(error OPT not defined in makefile.config)
+endif
+
+# --------------------------------------------------------------------------
+# Compiler options
+# --------------------------------------------------------------------------
+
+# -- IFORT compiler on Mac --
+
+ifeq ($(MY_FC), ifort)
+
+#FC77 = ifort
+#LD = ifort
+FC77 = ftn
+LD = ftn
+
+# F_OPTIONS that depend on optimization level:
+ifeq ($(OPT), opt)
+# WJS 02.12.10: adding -ipo to the following line makes things faster,
+# but for some reason breaks the compilation with large domains (giving
+# errors related to memory allocation)
+F_OPT_OPTIONS = -O3
+endif
+ifeq ($(OPT), O0)
+F_OPT_OPTIONS = -O0
+endif
+ifeq ($(OPT), debug)
+F_OPT_OPTIONS = -g -O0 -warn all -warn nouncalled -warn nounused -traceback -fpe0 -check all
+endif
+
+ifeq ($(OPT), BigMem)
+F_OPT_OPTIONS = -O3 -mcmodel=large -shared-intel   ##-shared-intel is not for BigRed2, which uses -shared
+LD_OPTIONS_EXT= -mcmodel=large -shared-intel
+endif
+
+ifeq ($(OPT), BigRed2)
+FC77 = ftn
+LD   = ftn
+F_OPT_OPTIONS =  -O3 -mcmodel=large -shared
+LD_OPTIONS_EXT=   -mcmodel=large -shared
+endif
+
+F_OPTIONS = $(F_OPT_OPTIONS) -132
+LD_OPTIONS = -lnetcdff -lnetcdf
+
+endif
+
+# -- END IFORT compiler on Mac --
+
+# -- GFORTRAN compiler --
+
+ifeq ($(MY_FC), gfortran)
+
+FC77 = gfortran
+LD = gfortran
+
+# F_OPTIONS that depend on optimization level:
+ifeq ($(OPT), opt)
+F_OPT_OPTIONS = -O3
+endif
+ifeq ($(OPT), O0)
+F_OPT_OPTIONS = -O0
+endif
+ifeq ($(OPT), debug)
+F_OPT_OPTIONS = -g -O0 -Wall
+endif
+
+F_OPTIONS = $(F_OPT_OPTIONS) -ffixed-line-length-132
+LD_OPTIONS = -lnetcdff
+
+endif
+
+# -- END GFORTRAN compiler --
+
+ifeq ($(MY_FC), xlf)
+
+# -- XLF compiler on Mac --
+
+FC77 = xlf
+LD = xlf
+
+# F_OPTIONS that depend on optimization level:
+ifeq ($(OPT), opt)
+F_OPT_OPTIONS = -O3
+endif
+ifeq ($(OPT), O0)
+F_OPT_OPTIONS = -O0
+endif
+ifeq ($(OPT), debug)
+F_OPT_OPTIONS = -C -qflttrap=inv:ov:zero:en:imp
+endif
+
+F_OPTIONS = $(F_OPT_OPTIONS) -qfixed=132 -qextname=fdate:flush
+LD_OPTIONS = -lnetcdf
+
+endif
+# -- END XLF compiler on Mac --
+
+# --------------------------------------------------------------------------
+# Make sure that some compiler was chosen
+# --------------------------------------------------------------------------
+
+# Note that FC77 and LD are set at the same time
+# So if one is undefined, then the other is undefined (and vice versa)
+ifndef FC77
+$(error FC77 not set: make sure a valid value is specified for MY_FC in makefile.config)
+endif
+
+# --------------------------------------------------------------------------
+# Variables holding the names of all the files needed for ibis
+# --------------------------------------------------------------------------
+
+# all source files needed:
+IBIS_SOURCES = allocate.f biogeochem.f canopy.f clim_file_utils.f	\
+climate.f com1d.f comatm.f combcs.f combgc.f comcrop.f comdiag.f	\
+comgrid.f comhour.f comhyd.f cominput.f commac.f comnitr.f compar.f	\
+compft.f comsno.f comsoi.f comsum.f comtex.f comveg.f comwork.f crops.f	\
+diagnostics.f gdd.f humid.f ies-io.f initial.f io.f main.f math.f	\
+netcdf_wrappers.f physiology.f radiation.f read_cfert.f			\
+read_input_description.f readpars.f snow.f soil.f solute.f stats.f	\
+toa_radiation.f utilities.f vegetation.f weather.f \
+hourlymet.f io_hourly.f io-dyn.F90
+# previous line added JCP (8-17-10)
+
+# same list as IBIS_SOURCES, but with .f replaced with .o:
+IBIS_OBJECTS = $(IBIS_SOURCES:.f=.o)
+
+# other files needed (files included by one or more source files):
+IBIS_OTHER = comsat.h
+
+# --------------------------------------------------------------------------
+# Rules for compilation, linkage, etc.
+# --------------------------------------------------------------------------
+
+ibis: $(IBIS_OBJECTS) $(IBIS_OTHER)
+# WJS 02.02.10: For some inexplicable reason, when we have a very large
+# domain (large npoi), it doesn't work to put allocate.o first here, at
+# least with ifort v. 10.0. When we do, we get an error like, "ld64-59.2
+# failed: rel32 out of range in _soilbgc_ from biogeochem.o". But things
+# seem to work fine as long as allocate.o is later in the build order.
+# Similarly, when testing this problem, I found that we get this error
+# message if the first file in the build order just contains a
+# subroutine that (1) includes comgrid.h and compar.h, and (2) does not
+# declare any local arrays. If we declare a local array in this testing
+# subroutine (even something like 'real x(1)'), the problem goes away.
+# But that simple fix does NOT fix allocate.f. I am inclined to chalk
+# this up to an issue with the compiler.
+	$(LD) $(IBIS_OBJECTS) $(LD_OPTIONS) $(LD_OPTIONS_EXT) $(MY_LD_OPTIONS) $(LIBS) -o ibis
+
+.f.o:
+	$(FC77) $(F_OPTIONS) $(MY_F_OPTIONS) $(INCLUDES) \
+        -c -o $*.o $*.f
+io-dyn.o:
+	$(FC77) $(F_OPTIONS) $(MY_F_OPTIONS) $(INCLUDES) \
+        -c -o io-dyn.o io-dyn.F90
+
+#------------------------------------------------------------------------
+# To put all necessary files in one file ready for distribution,
+# make sure the value for VERSION (in makefile.config) is correct.
+# then, type:
+# make tardist
+# you may then gzip or compress the file ibis_VERSION.tar
+
+tardist:
+	tar -cvf $(VERSION).tar ibis.infile makefile $(IBIS_SOURCES)	\
+  $(IBIS_OTHER) yearsrun.dat hist.fert.1945.1996 params.can params.veg	\
+  params.soi params.crp input_descriptions
+
+
+# --------------------------------------------------------------------------
+# Dependencies: These are built automatically using the sfmakedepend tool
+# --------------------------------------------------------------------------
+
+# Name of the file in which the dependencies will be listed
+MAKEFILE_INC = makefile.inc
+
+# In the following, the 'subst' inserts a space after each '-I' in the
+# INCLUDES variable (which allows us to find 'included' files in any
+# directory in INCLUDES)
+F_makedepend = ./sfmakedepend --file - --longpath $(subst -I,-I ,$(INCLUDES))
+
+# we re-build the depencies file if any source file or other required file changes
+depend $(MAKEFILE_INC): $(IBIS_SOURCES) $(IBIS_OTHER)
+	$(F_makedepend) $(IBIS_SOURCES) > $(MAKEFILE_INC)
+
+include $(MAKEFILE_INC)
+
+# --------------------------------------------------------------------------
+# "Phony" targets (clean, etc.):
+# --------------------------------------------------------------------------
+
+clean:
+	rm -f ibis *.o *.mod $(MAKEFILE_INC)
+
+clean_debug:
+	rm -f *__*.f90 ibis *.o *.mod $(MAKEFILE_INC)

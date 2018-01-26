@@ -1,0 +1,138 @@
+------------------------------------------------
+    Change log made by Y.Li (2015-06-26)
+------------------------------------------------
+Overview:
+- This version is intended for the branch <adamward-THMB> that couples Agro-IBIS and THMB
+- Other featuers also added to this version, for details and usage, refer to <User Guide for Agro-IBIS Branch adamward-THMB>
+
+------------------------------------------------
+    End Change log made by Y.Li
+------------------------------------------------
+
+Important things to know about building and running Agro-IBIS
+
+Last updated 5/28/10 by Bill Sacks (WJS; wsacks@gmail.com)
+
+--- Table of Contents ---
+
+I. Notes on doing an initial checkout and setup of the Agro-IBIS code
+II. How to change the climate dataset (e.g., zedx vs. cru/ncep)
+
+--- I. Notes on doing an initial checkout and setup of the Agro-IBIS code ---
+
+(Section last updated 5/28/10)
+
+After obtaining Agro-IBIS from the subversion repository, or another
+similar source, you must do the following things before compiling and
+running the Agro-IBIS code:
+
+--- OPTION A ---
+
+Choose this option if you want to copy the configuration of an existing
+Agro-IBIS installation. 
+
+IMPORTANT NOTE: This will only work properly if the existing
+installation is up-to-date in terms of the format of ibis.infile, other
+*.tmpl files, and the input directory. 
+
+(1) Run 'copy_setup /path/to/old/agro-ibis_installation'
+	- Where you should replace '/path/to/old/agro-ibis_installation'
+	with the actual path to the existing Agro-IBIS installation
+	whose configuration you wish to copy. 
+
+This does the following things:
+
+	- For each <filename>.tmpl, copies the local file (without the
+	  '.tmpl') from the existing installation to this directory (see
+	  below, under OPTION B, for notes on the *.tmpl files)
+
+	- Makes a symbolic link, 'input', pointing to the existing input
+	  directory (or its target, if it is a link itself)
+
+	- Sets up output and restart directories
+
+
+--- OPTION B ---
+
+Choose this option if you do not already have a working installation of
+Agro-IBIS, or if you want to start fresh.
+
+(1) Run 'initial_setup'. This does the following:
+
+	- Copies each <filename>.tmpl (i.e. template files) to
+          <filename>
+
+		- Your personal modifications should be done to the
+		  files without '.tmpl' (e.g. modify 'ibis.infile'
+		  rather than 'ibis.infile.tmpl'). Changes to these
+		  files will not be seen by the subversion repository.
+
+		- If you want to make changes that others will see
+		  (after you make your next checkin to subversion),
+		  modify the *.tmpl files.
+	
+		- Basic customizations of the makefile (choosing your
+                  compiler and optimization level) should be done in
+                  'makefile.config'
+
+		- Note: if you later do an 'svn update' and see that
+                  some of these *.tmpl files have changed, you may have
+                  to update your personal copy of the file(s) to reflect
+                  this change. For example, if some new parameters were
+                  added to ibis.infile.tmpl, you will have to update
+                  your personal copy of ibis.infile to also include
+                  these new parameters: these changes to your personal
+                  copies are not done automatically.
+
+	- Sets up output directory
+
+	- Sets up restart directory
+
+(2) Create an 'input' directory
+
+	- Either copy over the netCDF files or make a symbolic link to
+          them ('ln -s')
+
+(3) Configure makefile.config for your compiler, desired optimization
+level, version identifier, and other user-specific compiler flags.
+
+	- Again, user-specific changes should go in makefile.config. You
+          should change makefile.config.tmpl IF AND ONLY IF you want
+          everyone else's makefile.config to be modified the next time
+          you do a checkin to subversion.
+
+(4) Modify ibis.infile and comgrid.f, if necessary
+
+	- Again, user-specific changes should go in ibis.infile and
+          comgrid.f. You should change ibis.infile.tmpl and
+          comgrid.f.tmpl IF AND ONLY IF you want everyone else's
+          versions of these files to be modified the next time you do a
+          checkin to subversion
+
+
+--- AFTER DOING OPTION A OR OPTION B, ABOVE ---
+
+You may then, optionally, run setup_run <dirname> to setup a run in the
+given subdirectory. That will allow you to perform multiple runs without
+worrying about their outputs overwriting each other.
+
+      
+--- II. How to change the climate dataset (e.g., zedx vs. cru/ncep) ---
+
+(1) Change the 'datasource' parameter in ibis.infile to an existing
+input description file in input_descriptions, or make a new input
+description file describing the climate dataset you want to use.
+
+(2) If necessary (e.g., if the new dataset has a different resolution),
+change the parameters in comgrid.f (nlat, nlon, npoi, etc.) to be
+consistent with the new dataset.
+
+(3) Put the new input files in the 'input' directory, if they're not
+already there. If the new dataset has a different resolution or extent,
+then you will also have to replace the other IBIS input files. Bill's
+recommendation: put all of the input files needed for a run at a given
+resolution in a directory outside of your Agro-IBIS directory. Then
+simply make a symbolic link pointing to this directory ('ln -s
+</PATH/TO/INPUT/FILES> input'). Make sure that the file names and paths
+are consistent with those given in the input description file that you
+chose in step 1.

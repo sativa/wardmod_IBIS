@@ -1,0 +1,64 @@
+0          ! irestart   0: not a restart run  1: restart run
+1948        ! irstyear   actual calendar year of restart run
+2011        !1751        ! iyear0     initial year of simulation (don't change for restart)
+1           !8           ! nrun       number of years in this simulation (change for restart)
+zedx        ! datasource: file in input_descriptions directory describing the climate data source (remember to also change comgrid.f if necessary)
+.true.     ! weather_generator: if true, use weather generator prior to iyrdaily; if false, use random year of data
+1948        ! iyranom    year to start reading anomalies (don't chng for restart) (ignored if weather_generator=FALSE: then we read anomalies whenever we read daily data)
+1948        ! iyrdaily   year to start reading daily data (ditto)
+9999        ! imetyear   year to start using hourly met data from arlington field station (ditto)
+9999        ! imetend    year to end reading in hourly met data from arlington field station (ditto)
+-1          ! seed       initial random number seed: should be < 0, or 0 to seed the random number generator using the current time
+0           ! soilcspin  0: no soil spinup, 1: acceleration procedure used 
+1           ! flg_wrestart  1(default): write restart files  0: no restart files
+1           ! iyearout   0: no yearly output, 1: yearly output   2: yearly output,  in a yearly basis
+1           ! imonthout  0: no monthly output, 1: monthly output 2: monthly output, in a yearly basis
+0           ! idailyout  0: no daily output, 1: daily output; 2: (for flg_dailyout_freq != 0 only) for daily output, output only daily4thmb files
+0           ! ihourlyout 0: no hourly output, 1: hourly output
+1           ! isimveg    0: static veg, 1: dynamic veg, 2: dynamic veg-cold start
+0           ! isimfire   0: wildfire off, 1: wildfire on
+0           ! isimco2    0: fixed co2,  1: ramped co2
+0           ! irrigate_flag   0: no irrigation 1: irrigation strategy used everywhere 2: read map specifying where irrigation is used
+0           ! nstress    0: no nitrogen stress, 1: apply nitrogen stress
+0           ! isoybean   0: soybeans not grown 1: soybeans grown everywhere 
+0           ! imaize     0: maize not grown 1: maize grown everywhere 
+0           ! iwheat     0: no wheat grown 1: spring wheat grown everywhere 2: winter wheat 
+0           ! irotation  0: none 1: winter wheat/fallow 2: 2 corn/soy 3: corn/corn/soy 4: soy/winter wheat/corn 5:soy/corn 
+0           ! iholdsoiln 0: doesn't save soil inorganic N from restart 1: save inorganic soil N  
+0           ! isoil_layer   0(default): no; 1: yes    Read-in soils with layered data from a NetCDF file.
+0           ! iyr_pft       0(default): no; 1: yes    Read-in pft on a year-by-year basis from NetCDF files
+0           ! iyr_fert      0(default): no; 1: yes    Read-in fertilizer application on a year-by-year basis from NetCDF files
+0           ! iagro_thmb    0(default): no coupled argo-ibis thmb simulation; 1: yes (1-way couple); 2: yes (2-way couple)
+'/Users/WardLab/Documents/agro-ibis/yuwei/thmb/test'    ! agro_thmb_path  directory for communication files for coupled agro-ibis thmb
+200         !commu_MaxWait(default 200):  Number of times to wait for communiation files
+1           !commu_sleep(integer, default 1): put the code to sleep during wait in [seconds]
+1.0         ! ffact      numeric multiplying factor applied to N fertilizer after end of fertilizer data (for all crops)
+.false.     ! management_prescribed: If true, use prescribed planting dates & cultivars, as read from maps; if false, use prognostic planting dates & cultivars
+transient   ! planting_input: Suffix on the planting date input file name (e.g., 'transient', 'detrended', 'linearized' or 'fixed'), for management_prescribed=true
+transient   ! cultivar_input: Suffix on the cultivar input file name (e.g., 'transient' or 'fixed'), for management_prescribed=true
+1           ! overveg    0: PFTs compete based on climate constraints  1: PFTs compete based on current land cover & climate 
+9           ! isoilay    soil layer for which nitrate leaching/drainage is output  
+0.000370    ! co2init    initial co2 concentration in mol/mol (real)
+0.209000    ! o2init     initial o2 concentration in mol/mol (real)
+3600.       ! dtime      time step in seconds
+0           ! idiag      0: no diagnostic output, 1-10 # of files to output
+41.79167    !47.04167    !41.79167    ! snorth		northern latitude for subsetting in/output
+41.375      !39.37500     !41.375    ! ssouth     southern latitude for subsetting in/output
+-92.79166   !-94.62498     !-92.79166    ! swest      western longitude for subsetting in/output
+-91.625     !-86.29166    !-91.625    ! seast      eastern longitude for subsetting in/output
+0           !flg_udg; flag for user-defined grid. (default=0) 1=use (lower left corner base) 2=use (upper left corner base), then (snorth,ssouth,swest,seast) will be ignored, (lon_llcorner,lat_llcorner), (is,ie), (js,je) will be used instead
+551 930         !integer. (udg_is,udg_ie) pair
+144 411        !integer. (udg_js,udg_je) pair
+-96.504  40.335     !(lon,lat) base corner pair of the computational point; with flg_udg = 1, this is lower left corner; with flg_udg = 2, this pair means upper left corner)
+0 5         !flg_debug 0:(default) no debug/test;  1: debug/test mode (one-day);  2: debug/test mode (one-month);
+0           !flg_detail 0:(default) no detailsl 1: show run-time details
+0           !flg_dailyin_freq:  0:(default) NO read daily input in a frequency; 1: read in daily input in a montly frequency; 2: yearly
+0           !flg_dailyout_freq: 0:(default) write daily output at the end of the day; 1: at the end of the month; 2: at the end of the year 
+0           !flg_daily4thmb, output daily output for thmb? 0(default): no; 1:yes (daily-scale); 2: yes (hourly-scale) - only support with the use of <flg_dailyout_freq> != 0
+0           !flg_sandlayers: force the last 2 layers as sand? 0:(default) no; 1: yes;
+0           !flg_cmask: use computational mask file? 0:(default) no; 1: yes.
+'mask_file_name.nc'  !file name for the mask; default location at <input>; compute the cell with value 1, otherwise skip
+'var_name_mask'      !variable name of the mask
+0           !flg_coverCrops 0:(default): No cover crops; 1: plant cover crops (c4 grasses); 2: plant cover crops (c3 grasses)
+0           !flg_mngt: management control by <management.nml>  0(default): no; 1:yes
+'./mpi/proc1/'       !myprocDir,for mpi version, base directory for proc<n>

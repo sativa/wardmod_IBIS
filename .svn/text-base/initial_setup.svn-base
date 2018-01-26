@@ -1,0 +1,23 @@
+#!/bin/bash
+
+# Does the initial setup for fresh checkout of Agro-IBIS:
+# - Copies each <filename>.tmpl to <filename>
+# - Sets up output directory
+# - Sets up restart directory
+#
+# See also: copy_setup, which performs similar actions, but copies an
+# exsting installation
+
+echo "Copying each <filename>.tmpl to <filename>:"
+for fl in *.tmpl; do
+    base=`basename $fl .tmpl`  # strip trailing '.tmpl'
+    cp -i -v $fl $base
+done
+
+echo
+echo "Setting up output directory:"
+mkdir -v -p output/daily output/monthly output/yearly output/hourly
+
+echo
+echo "Setting up restart directory:"
+mkdir -v -p restart

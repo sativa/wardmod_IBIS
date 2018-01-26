@@ -1,0 +1,240 @@
+This README file last updated: Feb. 11, 2010
+
+The files in this directory describe the characteristics of the possible
+climate data sets that can be used as input to Agro-IBIS. The name of
+each file corresponds to the possible values of the datasource input
+parameter. The appropriate file is read by the subroutine
+read_input_description.
+
+The files are formatted as Fortran namelists. Any parameters not set
+explicitly will take on default values as specified in
+read_input_description.
+
+Some notes on the format of these files:
+- Comments begin with '!'.
+- The first non-comment line must be '&input_description', which is
+the name of the namelist.
+- Parameters are defined as PARAM_NAME = VALUE
+- The file should be terminated with '/'
+
+When adding a new variable to these files, you should change:
+- This README file
+- read_input_description.f: Add the variable to the namelist and to the
+initialization section
+- cominput.h: Add a variable declaration and put the variable in one of
+the existing common blocks or in a new common block
+- Any input description file for which the value differs from its
+default
+
+Note: When changing which climate data set you're using, you often will
+also have to change some values in comgrid.h (nlon, nlat, xres, yres,
+etc.). These variables are defined in comgrid.h rather than in these
+input files because they are needed at compile time to create arrays of
+the proper size.
+
+--- read_daily_directly ---
+
+If TRUE, we read daily values directly. In this case, we do not do
+anything with monthly timeseries (but we still require files giving
+monthly climatologies). This means:
+
+	- nanom (in this input description file) should be 0
+
+	- iyranom should equal iyrdaily (in ibis.infile)
+
+
+If FALSE, we read separate files containing daily anomaly values, and
+apply these anomalies to the monthly values. (Or we only use monthly
+values, and use the weather generator to generate daily values.)
+
+
+--- one_file_per_year ---
+
+If TRUE, there is a separate input file for each year for the daily
+data (the monthly data are still all contained in a single file).
+
+If FALSE, all years are contained in the same input file.
+
+
+--- read_tmin_tmax ---
+
+If TRUE, we read tmin and tmax directly.
+
+If FALSE, we read tmean and trange, and calculate estimated values of
+tmin and tmax.
+
+
+--- read_radiation ---
+
+If TRUE, we read incoming radiation directly.
+
+If FALSE, we read cloud cover fraction and calculate estimated
+values of incoming radiation.
+
+
+--- correct_sphumid ---
+
+If TRUE, we do corrections of specific humidity that I (WJS) believe are
+intended for when the input data are averages of observed relative
+humidity (as opposed to, say, averages of specific humidity observations
+that were then converted to averages of RH). These corrections correct
+for covariances between RH and temperature. These corrections were
+originally implemented for monthly humidity observations (with
+anomalies); I'm not positive that they are applicable when
+read_daily_directly = TRUE.
+
+Note: Although it is possible to set both correct_sphumid = TRUE and
+conserve_tdew = TRUE, generally only one (or neither) should be TRUE.
+correct_sphumid is intended (I think) for when the input data are
+derived from averages of observed relative humidity, whereas
+conserve_tdew is intended for when the input data are derived from
+averages of the observed dewpoint temperature.
+
+
+--- conserve_tdew ---
+
+If TRUE, conserve daily mean dewpoint temperature rather than daily mean
+specific humidity when creating the diurnal cycle of humidity. This is
+intended for datasets where the humidity input was derived from daily
+averages of the observed dewpoint temperature.
+
+If FALSE, conserve daily mean specific humidity when creating the
+diurnal cycle of humidity.
+
+Note: Although it is possible to set both correct_sphumid = TRUE and
+conserve_tdew = TRUE, generally only one (or neither) should be TRUE.
+correct_sphumid is intended (I think) for when the input data are
+derived from averages of observed relative humidity, whereas
+conserve_tdew is intended for when the input data are derived from
+averages of the observed dewpoint temperature.
+
+
+--- istyrm ---
+
+First year monthly values exist in monthly timeseries files (if these
+files are present).
+
+
+--- nanom ---
+
+Number of years in monthly timeseries files (if these files are present)
+
+
+--- istyrd ---
+
+First year daily values exist in daily timeseries files.
+
+
+--- nanomd ---
+
+Number of years in each daily timeseries file if one_file_per_year =
+FALSE, or number of years of daily timeseries files if one_file_per_year
+= TRUE.
+
+
+--- level_var ---
+
+Name of level variable (if any) in the input files.
+
+
+--- INPUT FILE NAMES ---
+
+These file names should specify the name of all input climate files,
+giving the full path relative to the input directory. 
+
+It is okay for some file names not to be specified, but in this case the
+file name will be set to ' ', and no file will be read for that
+variable. This can be the case for files that are not used with the
+given data set (e.g., 'cloud' when read_radiation is TRUE); it can also
+be the case for monthly timeseries - in this case, we use the monthly
+climatologies in place of a monthly timeseries for this variable.
+However, all required input files must be specified.
+
+Note that these file names should NOT contain the trailing '.nc'; also,
+for one_file_per_year = TRUE, they also should NOT contain the _YYYY
+suffix.
+
+Example: A file name of zedx/daily/tmax would read in files of the form
+input/zedx/daily/tmax_1948.nc, input/zedx/daily/tmax_1949.nc, etc.
+(assuming that one_file_per_year = TRUE).
+
+The variables are of the form:
+
+fn_<VAR>_<RESOLUTION>
+
+(exception: fn_tminavgann: this file has a single time slice, for the
+annual climatology)
+
+<RESOLUTION> is one of:
+
+_mon_clim: monthly climatologies (12 times in the file)
+
+_mon: monthly timeseries (12*nyears times in the file); only used if
+read_daily_directly is false
+
+_daily: daily timeseries
+
+	- If read_daily_directly is false, these give anomalies rather
+	than the actual daily values.
+
+	- If one_file_per_year is true, the actual file names will be of
+	the form fn_<VAR>_<RESOLUTION>_<YYYY>.nc, and will contain 365
+	or 366 times
+
+	- If one_file_per_year is true, the actual file names will be of
+	the form fn_<VAR>_<RESOLUTION>.nc, and will contain
+	approximately 365.25*nyears times
+
+
+<VAR> is one of:
+
+cloud: cloud cover (percent)
+
+	- Only used if read_radiation is false
+
+rads: solar radiation (W m-2)
+
+	- Only used if read_radiation is true
+
+temp: average temperature (degrees C)
+
+	- Only used if read_tmin_tmax is false
+
+dtr: diurnal temperature range (degrees C)
+
+	- Only used if read_tmin_tmax is false
+
+tmin: daily min. temperature (degrees C)
+
+	- Only used if read_tmin_tmax is true
+
+tmax: daily max. temperature (degrees C)
+
+	- Only used if read_tmin_tmax is true
+
+prec: precipitation rate (mm/day)
+
+rh: relative humidity (percent)
+
+wspd: wind speed (m/s)
+
+wetd: wet days per month
+
+	- Only used in weather generator. Thus, we never have a daily
+          version of this file.
+
+tminavgann: Average daily minimum air temperature (degrees C)
+
+	- This file has a single time slice: it is an annual climatology
+
+	- This variable name does not have a <RESOLUTION> suffix: it is
+          simply fn_tminavgann
+
+
+--- INPUT VARIABLE NAMES ---
+
+There is one input variable name for each input file name, giving the
+name of the data variable in that file.
+
+If not specified, these variable names are set to the default values as
+specified in the read_input_description subroutine.

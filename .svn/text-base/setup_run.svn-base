@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# Usage: setup_run path
+#
+# Makes directory with given path name; makes necessary output folders;
+# copies ibis.infile, and makes symbolic links to executable and other
+# input files.
+#
+# This allows you to perform multiple runs simultaneously without
+# worrying about them overwriting each other's outputs.
+#
+# Note: The current behavior (as of 7-12-10) is to make a copy of
+# ibis.infile, but to make links to the executable and all other
+# parameter & input files. This behavior makes sense if the only thing
+# that differs between runs is ibis.infile. However, if you are doing
+# runs with, say, different parameter values in some of the params.*
+# files, then you will probably want to change the behavior to make
+# copies of these files rather than links. Similarly, if the
+# executable differs between runs, then you will probably want to
+# change the script to make a copy of the executable rather than a
+# link to it.
+
+
+if (( $# != 1 )); then
+    echo "Usage: $0 path"
+    echo "Makes directory with given path name; makes necessary output folders;"
+    echo "copies ibis.infile, and makes symbolic links to executable and other"
+    echo "input files."
+    exit 1
+fi
+
+dir=$1
+
+if [ -e $dir ]; then
+    echo "$dir already exists"
+    echo "Please remove it and then rerun this script"
+    exit 1
+fi
+
+echo "Creating directory:"
+mkdir -v -p $dir
+
+echo
+echo "Setting up output and restart directories:"
+mkdir -v -p $dir/output/daily $dir/output/monthly $dir/output/yearly $dir/output/hourly $dir/restart
+
+echo
+echo "Copying ibis.infile:"
+cp -v ibis.infile $dir
+
+echo
+echo "Making symbolic links:"
+curdir=`pwd`
+ln -v -s $curdir/ibis $curdir/input $curdir/params.* $curdir/hist.fert.* $curdir/input_descriptions $dir

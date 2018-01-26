@@ -1,0 +1,27 @@
+------------------------------
+   Y. Li 2015-07-24 
+
+note: variable enclosed in < >
+-------------------------------
+# Things to check (search Y.Li for location)
+- snow.f: fi(i), potentially devided by zero fi(i)
+- solute.f: wisoi(i,k), potentially devided by zero wisoi(i,k)
+- crops.f: lai(i,1), potentially devided by zero lai(i,1) <-- avglail = 0 <-- [plai(i,13), plai(i,14), plai(i,15)] = 0. It seems the code only consider pft type 13, 14, and 15.
+- crops.f: rdm, potentially devided by zero rdm <-- [dmleaf,dmstem] = 0
+- stats.f: adaet(i), potentially devided by zero adaet(i)
+- canopy.f: tg(i), potentially devided by zero tg(i)
+
+# Potential errors (which usually are ignored by the set up of the compiler, yet they are there)
+- io.f : subroutine <wdaily> "write(tdate(1:3),'(i3)') nday", output conversion error, <nday> can easiliy be > 1000
+
+# code (to add comment upon commit)
+- 2015-07-07: modify netcdf utilities (readvar) for compatability and better user info
+
+# <npoi>: total number of land points defined in "comgrid.f". 
+1) the code assumes <nlonsub>*<nlatsub> == <npoi>
+
+# <lmask>: indicator for land surface (0:water; 1:land). read-in from "surta.nc". used by:
+1) <nlpoints> is then counted as number of land points of the grid.
+2) function <arr2vec> to put <array> to <vect> when <lmask> == 1
+3) In both 1) and 2), if <nlpoints> != <npoi>, the program is set to stop
+4) 
